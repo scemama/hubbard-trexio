@@ -1,13 +1,13 @@
 # hubbard-trexio
 
-A command-line tool written in Rust that generates [TREXIO](https://trex-coe.eu/trexio) files
+A command-line tool written in Rust that generates [TREXIO](https://trex-coe.github.io/trexio/) files
 containing the one- and two-electron integrals for the **Hubbard model** on a rectangular lattice.
 
 The Hubbard model Hamiltonian is:
 
 $$H = -t \sum_{\langle i,j \rangle,\sigma} c_{i\sigma}^\dagger c_{j\sigma} + U \sum_i n_{i\uparrow} n_{i\downarrow}$$
 
-where *t* is the hopping parameter (kinetic energy between neighbouring sites), *U* is the
+where *t* is the hopping parameter (kinetic energy between neighboring sites), *U* is the
 on-site Coulomb interaction, and the lattice uses periodic boundary conditions.
 
 The output TREXIO file stores the integrals in a format that can be read by any quantum chemistry
@@ -28,7 +28,7 @@ source $HOME/.cargo/env
 
 Rust **1.85 or later** is required (this project uses `edition = "2024"`, stabilised in Rust 1.85.0, released February 2025).
 
-### 2. TREXIO library (optional but recommended for HDF5 support)
+### 2. TREXIO library
 
 The tool tries to write an HDF5-backed TREXIO file first, and falls back to a plain-text backend
 if HDF5 is unavailable.  For HDF5 support, install the TREXIO C library **and** the HDF5
@@ -39,8 +39,6 @@ development headers before building:
   ```bash
   sudo apt install libhdf5-dev
   ```
-  Then install the TREXIO library from source or your distribution's package manager:
-  <https://github.com/TREX-CoE/trexio/releases>
 
 * **Fedora / RHEL**
 
@@ -54,6 +52,9 @@ development headers before building:
   brew install hdf5
   ```
 
+Then install the TREXIO library from source or your distribution's package manager:
+  <https://github.com/TREX-CoE/trexio/releases>
+  
 If you skip the HDF5 library the tool will still work — it will write a plain-text TREXIO
 directory instead of a single `.h5` file.
 
@@ -82,15 +83,15 @@ cargo install --path .
 ## Usage
 
 ```
-hubbard-trexio -n <n_sites> [-m <m_orbitals>] [-t <hopping>] [-u <interaction>] TREXIO_FILE
+hubbard-trexio -n <n_sites_x> [-m <m_sites_y>] [-t <hopping>] [-u <interaction>] TREXIO_FILE
 ```
 
 ### Options
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `-n <n_sites>` | Number of sites along the x-axis (**required**) | — |
-| `-m <m_orbitals>` | Number of sites along the y-axis | `1` |
+| `-n <n_sites_x>` | Number of sites along the x-axis (**required**) | — |
+| `-m <m_sites_y>` | Number of sites along the y-axis | `1` |
 | `-t <hopping>` | Hopping parameter *t* | `1.0` |
 | `-u <interaction>` | On-site interaction parameter *U* | `1.0` |
 | `TREXIO_FILE` | Output file path (**required**) | — |
@@ -149,8 +150,7 @@ Hubbard Model Integrals
 ```
 
 The resulting TREXIO file can be read by any program that links against the TREXIO library
-(e.g. [CHAMP](https://github.com/TREX-CoE/champ),
-[QMCkl](https://github.com/TREX-CoE/qmckl), or custom post-processing scripts).
+(e.g. [Quantum Package](https://github.com/QuantumPackage/qp2)).
 
 ---
 
