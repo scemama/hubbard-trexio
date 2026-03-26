@@ -1,17 +1,12 @@
 use trexio;
 use ndarray::*;
-use std::collections::HashMap;
 
-#[derive(Debug)]
 pub struct HubbardModel {
-    n: usize,
-    m: usize,
-    t: f64,
-    u: f64,
-
-    mo_num: usize,
-    mo_1e: Array2<f64>,
-    mo_2e: Vec<(usize,usize,usize,usize,f64)>,
+    ao_num: usize,
+    ao_1e: Array2<f64>,
+    ao_overlap: Array2<f64>,
+    ao_2e: Vec<(usize,usize,usize,usize,f64)>,
+    ao_2e_cholesky: Vec<(usize,usize,usize,f64)>,
 }
 
 impl HubbardModel {
@@ -19,10 +14,11 @@ impl HubbardModel {
 
 
         // Build lattice
-        let mo_num = n*m;
+        let ao_num = n*m;
 
-        let mut mo_1e = Array2::zeros( (mo_num,mo_num) );
-        let mut mo_2e = vec![];
+        let mut ao_1e = Array2::zeros( (ao_num,ao_num) );
+        let mut ao_2e = vec![];
+        let mut ao_2e_cholesky = vec![];
 
         for i in 0..n {
           let up   = if i>0 {i-1} else {n-1};
@@ -34,16 +30,17 @@ impl HubbardModel {
             let ij = i*m + j;
             for (k,l) in v {
                 let kl = k*m + l;
-                mo_1e[[ij,kl]] = -t;
+                ao_1e[[ij,kl]] -= t;
             }
-            mo_1e[[ij,ij]] = 0.0;
-            mo_2e.push( (ij,ij,ij,ij,u) );
+            ao_1e[[ij,ij]] = 0.0;
+            ao_2e.push( (ij,ij,ij,ij,u) );
+            ao_2e_cholesky.push( (ij,ij,ij,u.sqrt()) );
           }
         }
 
+        let ao_overlap = Array2::eye( ao_num );
 
-        Self { n, m, t, u,
-        mo_num, mo_1e, mo_2e }
+        Self { ao_num, ao_1e, ao_2e, ao_overlap, ao_2e_cholesky }
     }
 
     pub fn write(&self, trexio_filename: &str) {
@@ -56,11 +53,15 @@ impl HubbardModel {
                    }
            };
 
-        file.write_electron_up_num((self.mo_num/2).try_into().unwrap());
-        file.write_electron_dn_num((self.mo_num/2).try_into().unwrap());
-        file.write_mo_num(self.mo_num);
-        file.write_mo_1e_int_core_hamiltonian(&self.mo_1e.flatten().to_vec());
-        file.write_mo_2e_int_eri(0, &self.mo_2e);
+        file.write_electron_up_num((self.ao_num/2).try_into().unwrap()).unwrap();
+        file.write_electron_dn_num((self.ao_num/2).try_into().unwrap()).unwrap();
+        file.write_nucleus_repulsion(0.0).unwrap();
+        file.write_ao_num(self.ao_num).unwrap();
+        file.write_ao_1e_int_overlap(&self.ao_overlap.flatten().to_vec()).unwrap();
+        file.write_ao_1e_int_core_hamiltonian(&self.ao_1e.flatten().to_vec()).unwrap();
+        file.write_ao_2e_int_eri(0, &self.ao_2e).unwrap();
+        file.write_ao_2e_int_eri_cholesky_num(self.ao_2e_cholesky.len()).unwrap();
+        file.write_ao_2e_int_eri_cholesky(0, &self.ao_2e_cholesky).unwrap();
     }
 }
 
