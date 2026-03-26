@@ -1,0 +1,14 @@
+[package]
+name = "hubbard-trexio"
+version = "0.1.0"
+edition = "2021"
+description = "Generates TREXIO files containing one- and two-electron integrals for the Hubbard model"
+license = "MIT"
+
+[[bin]]
+name = "hubbard-trexio"
+path = "src/main.rs"
+
+[dependencies]
+trexio = "2"
+ndarray = "0.15"
