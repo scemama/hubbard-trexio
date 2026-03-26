@@ -26,7 +26,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 source $HOME/.cargo/env
 ```
 
-Rust **1.56 or later** is required (this project uses `edition = "2021"`, supported since Rust 1.56.0; Rust 1.65+ is recommended for the best experience).
+Rust **1.85 or later** is required (this project uses `edition = "2024"`, stabilised in Rust 1.85.0, released February 2025).
 
 ### 2. TREXIO library (optional but recommended for HDF5 support)
 
@@ -156,4 +156,5 @@ The resulting TREXIO file can be read by any program that links against the TREX
 
 ## License
 
-MIT
+This project is licensed under the **GNU General Public License v3.0 or later** — see the
+[LICENSE](LICENSE) file for the full text.
