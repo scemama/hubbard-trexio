@@ -1,0 +1,8 @@
+[package]
+name = "hubbard-trexio"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ndarray = "0.17.2"
+trexio = "2.5.1"
