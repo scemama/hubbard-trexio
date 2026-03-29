@@ -34,6 +34,7 @@ fn main() {
     let mut m = 1;
     let mut t = 1.0;
     let mut u = 1.0;
+    let mut p = true;
 
     while args.len()>1 {
         match args[0].as_str() {
@@ -41,6 +42,7 @@ fn main() {
             "-m" => m = args[1].parse::<usize>().expect("m must be a positive integer"),
             "-t" => t = args[1].parse::<f64>().expect("t must be a number"),
             "-u" => u = args[1].parse::<f64>().expect("u must be a number"),
+            "-p" => p = args[1].parse::<bool>().expect("p must be a bool"),
             _ => usage(&prog_name),
         }
         let _ = args.remove(0);
@@ -62,13 +64,14 @@ fn main() {
     println!("Hubbard Model Integrals");
     println!("");
     println!("  Sites : {} x {}", n, m);
+    println!("  Periodic : {}", p);
     println!("  t = {}", t);
     println!("  U = {}", u);
     println!("");
     println!("  File: {}", f);
     println!("");
 
-    let model = HubbardModel::new(n,m,t,u);
+    let model = HubbardModel::new(n,m,t,u,p);
     model.write(f);
 
 }

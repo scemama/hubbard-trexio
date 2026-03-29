@@ -10,7 +10,7 @@ pub struct HubbardModel {
 }
 
 impl HubbardModel {
-    pub fn new(n: usize, m: usize, t: f64, u: f64) -> Self {
+    pub fn new(n: usize, m: usize, t: f64, u: f64, periodic: bool) -> Self {
 
 
         // Build lattice
@@ -21,12 +21,19 @@ impl HubbardModel {
         let mut ao_2e_cholesky = vec![];
 
         for i in 0..n {
-          let up   = if i>0 {i-1} else {n-1};
-          let down = if i<n-1 {i+1} else {0};
+          let up   = if i>0 {Some(i-1)} else { if periodic {Some(n-1)} else {None} };
+          let down = if i<n-1 {Some(i+1)} else { if periodic {Some(0)} else {None} };
           for j in 0..m {
-            let left  = if j>0 {j-1} else {m-1};
-            let right = if j<m-1 {j+1} else {0};
-            let v = [ (up,j), (down,j), (i, left), (i, right) ];
+            let left  = if j>0 {Some(j-1)} else {if periodic {Some(m-1)} else {None} };
+            let right = if j<m-1 {Some(j+1)} else {if periodic {Some(0)} else {None} };
+            let v: Vec<_> = [ (up,Some(j)), (down,Some(j)),
+                              (Some(i), left), (Some(i), right) ]
+                .into_iter()
+                .filter_map(|(a,b)| { match (a,b) {
+                    (Some(a), Some(b)) => Some((a,b)),
+                    _ => None, } })
+                .collect();
+
             let ij = i*m + j;
             for (k,l) in v {
                 let kl = k*m + l;
